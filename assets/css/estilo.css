@@ -1,0 +1,215 @@
+/* Biblioteca de la Fundación Cultural Región de Colchagua
+   Mismo lenguaje que el tema Colchagua: tinta, papel, tres provincias (celeste, naranja, verde),
+   Newsreader para títulos e Instrument Sans para el texto. La fuerza visual está en las fotografías del terreno. */
+
+:root {
+  --tinta: #0C2A45; --tinta-2: #16406A; --tinta-3: #081B2E;
+  --papel: #F3F7FA; --linea: rgba(12, 42, 69, .1); --texto: #1C2833; --suave: #4A5B6A; --tenue: #6B7A87;
+  --celeste: #5EB1E3; --naranja: #F49739; --verde: #5BD31B; --celeste-t: #2B7DB0;
+  --titulos: 'Newsreader', Georgia, serif;
+  --cuerpo: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ancho: 1180px; --lectura: 64ch; --radio: 8px;
+  --curva: cubic-bezier(.2, .7, .2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 88px; }
+html { background: var(--tinta); }
+body { margin: 0; background: #fff; color: var(--texto); font: 400 1.0625rem/1.65 var(--cuerpo); -webkit-font-smoothing: antialiased; }
+img, video { display: block; max-width: 100%; height: auto; }
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--titulos); font-weight: 500; line-height: 1.15; color: var(--tinta); text-wrap: balance; }
+h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); letter-spacing: -.01em; }
+h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); }
+h3 { font-size: 1.375rem; }
+p { margin: 0 0 1em; }
+a { color: var(--tinta-2); text-underline-offset: .18em; text-decoration-thickness: 1px; transition: color .15s var(--curva); }
+a:hover { color: var(--celeste-t); }
+:focus-visible { outline: 3px solid var(--naranja); outline-offset: 3px; border-radius: 2px; }
+cite { font-style: normal; font-weight: 500; }
+.envoltura { width: min(100% - 48px, var(--ancho)); margin-inline: auto; }
+.saltar { position: absolute; left: -9999px; }
+.saltar:focus { left: 16px; top: 16px; z-index: 100; padding: 8px 16px; background: var(--tinta); color: #fff; }
+
+/* Tres provincias: la firma del sitio */
+.tri { display: inline-flex; width: 36px; height: 4px; flex: none; }
+.tri i { flex: 1; }
+.tri i:nth-child(1) { background: var(--celeste); }
+.tri i:nth-child(2) { background: var(--naranja); }
+.tri i:nth-child(3) { background: var(--verde); }
+.tri--ancho { display: flex; width: 100%; }
+.rotulo { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; font-size: .9375rem; font-weight: 500; color: var(--tinta-2); }
+
+/* Botones */
+.boton { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border: 1px solid var(--naranja); border-radius: var(--radio); background: var(--naranja); color: var(--tinta); font-weight: 600; text-decoration: none; transition: background-color .15s var(--curva), border-color .15s var(--curva); }
+.boton:hover { background: #ffa951; border-color: #ffa951; color: var(--tinta); }
+.boton--claro { min-height: 40px; padding: 0 16px; background: transparent; border-color: var(--linea); color: var(--tinta); font-weight: 500; }
+.boton--claro:hover { background: var(--papel); border-color: var(--linea); }
+.enlace { font-weight: 500; color: inherit; }
+.acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 32px; }
+
+/* Cabecera */
+.cabecera { position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, .96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--linea); }
+.cabecera__barra { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; }
+.marca { display: flex; align-items: center; gap: 12px; color: var(--tinta); text-decoration: none; }
+.marca__logo { width: auto; height: 44px; }
+.marca__nombre { padding-left: 12px; border-left: 1px solid var(--linea); font-family: var(--titulos); font-size: 1.375rem; font-weight: 500; line-height: 1; }
+.menu { display: flex; align-items: center; gap: 32px; }
+.menu ul { display: flex; gap: 24px; margin: 0; padding: 0; list-style: none; }
+.menu ul a { display: block; padding: 8px 0; border-bottom: 2px solid transparent; color: var(--tinta); font-weight: 500; text-decoration: none; }
+.menu ul a:hover, .menu ul a[aria-current="page"] { border-bottom-color: var(--naranja); }
+.menu-boton { display: none; }
+
+/* Portada: el video del terreno a todo el ancho */
+.portada { position: relative; display: flex; align-items: flex-end; min-height: min(88vh, 760px); padding: 128px 0 64px; overflow: hidden; color: #fff; background: var(--tinta-3); }
+.portada__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.portada::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 27, 46, .25), rgba(8, 27, 46, .55) 40%, rgba(8, 27, 46, .9)); }
+.portada__texto { position: relative; z-index: 1; }
+.portada h1 { max-width: 18ch; color: #fff; }
+.portada .rotulo { color: #fff; }
+.portada__bajada { max-width: 54ch; font-size: 1.1875rem; color: rgba(255, 255, 255, .9); }
+.portada .enlace { color: #fff; }
+
+/* Encabezado de páginas internas */
+.encabezado { position: relative; padding: 64px 0 32px; }
+main { overflow-x: clip; }
+.encabezado::before { content: ""; position: absolute; right: -10%; top: -40%; width: 70%; aspect-ratio: 16 / 9; background: url('../img/curvas.svg') center / contain no-repeat; opacity: .07; pointer-events: none; }
+.encabezado h1 { max-width: 20ch; }
+.encabezado__bajada { max-width: 56ch; font-size: 1.1875rem; color: var(--suave); }
+
+/* Bloques */
+.bloque { padding-block: 64px; }
+.bloque--papel { background: var(--papel); }
+.bloque h2 + p, .bloque h2 + ul { margin-top: 0; }
+.dos-columnas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px 64px; align-items: center; }
+.dos-columnas--imagen { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+.dos-columnas p, .lista { max-width: var(--lectura); }
+.tres-columnas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+
+/* Láminas: fotografías con pie, como en el tema Colchagua */
+.lamina { margin: 0; }
+.lamina img, .lamina video { width: 100%; border-radius: 4px; box-shadow: 0 1px 0 rgba(12, 42, 69, .08), 0 24px 40px -28px rgba(12, 42, 69, .55); }
+.lamina figcaption { margin-top: 12px; padding-left: 12px; border-left: 3px solid var(--naranja); font-size: .875rem; line-height: 1.45; color: var(--suave); }
+.lamina--retrato { max-width: 360px; justify-self: center; }
+.lamina--retrato img { filter: grayscale(1); }
+
+.lamina--ancha { max-width: 1040px; margin-inline: auto; }
+.lamina--ancha img { aspect-ratio: 4 / 3; object-fit: cover; }
+.sede-portada { max-width: none; margin-bottom: 32px; }
+.sede-portada img { aspect-ratio: 21 / 9; object-position: center 70%; }
+.lista--pasos { padding-left: 24px; }
+.lista--pasos li { padding-left: 4px; margin-bottom: 12px; }
+.lista--pasos li::marker { font-weight: 600; color: var(--tinta); }
+
+/* Tarjetas */
+.tarjeta { display: block; color: inherit; text-decoration: none; }
+.tarjeta img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; margin-bottom: 16px; transition: opacity .2s var(--curva); }
+.tarjeta:hover img { opacity: .88; }
+.tarjeta h3 { margin-bottom: 8px; }
+.tarjeta:hover h3 { color: var(--celeste-t); }
+.tarjeta p { margin: 0; color: var(--suave); }
+
+/* Cita */
+.cita { margin: 0; padding-left: 24px; border-left: 4px solid var(--naranja); }
+.cita p { font-family: var(--titulos); font-size: 1.5rem; line-height: 1.45; color: var(--tinta); }
+.cita footer { font-size: .9375rem; color: var(--suave); }
+
+/* Hitos del trámite */
+.hitos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; padding: 0; list-style: none; counter-reset: hito; }
+.hitos li { padding-top: 16px; border-top: 2px solid var(--tinta); }
+.hitos time { display: block; margin-bottom: 8px; font-weight: 600; color: var(--tinta); }
+.hitos span { color: var(--suave); }
+.hitos__pendiente { border-top-style: dashed !important; border-top-color: var(--tenue) !important; }
+
+/* Ficha bibliográfica: datos del trámite o de la colección */
+.ficha { margin: 0; padding: 8px 24px; background: #fff; border: 1px solid var(--linea); border-left: 4px solid var(--celeste); border-radius: var(--radio); }
+.ficha div { display: grid; grid-template-columns: 8rem 1fr; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--linea); }
+.ficha div:last-child { border-bottom: 0; }
+.ficha dt { font-size: .875rem; color: var(--tenue); }
+.ficha dd { margin: 0; font-weight: 500; color: var(--tinta); }
+.cifra { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+
+/* Lista */
+.lista { margin: 0 0 24px; padding-left: 20px; }
+.lista li { margin-bottom: 8px; }
+.lista li::marker { color: var(--naranja); }
+
+/* Galería del terreno */
+.galeria { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding-bottom: 32px; }
+.galeria img { aspect-ratio: 4 / 3; object-fit: cover; }
+.galeria__video { grid-row: span 2; }
+.galeria .lamina:not(.galeria__video) { display: flex; flex-direction: column; }
+.galeria .lamina:not(.galeria__video) img { flex: 1; min-height: 0; }
+.galeria--ancho-2 { grid-column: span 2; }
+.galeria--ancho-2 img { aspect-ratio: 8 / 3; }
+.galeria--ancho-3 { grid-column: span 3; }
+.galeria--ancho-3 img { aspect-ratio: 4 / 1; }
+.galeria--alto { grid-row: span 2; }
+.galeria--alto img { aspect-ratio: auto; height: 100%; }
+.galeria__video video { height: calc(100% - 40px); max-height: 640px; object-fit: cover; background: var(--tinta-3); }
+
+/* Colección: mosaico de fotos (la primera más grande) */
+.mosaico { display: grid; grid-template-columns: 2fr 1fr; grid-auto-rows: minmax(0, auto); gap: 24px; padding-bottom: 16px; }
+.mosaico__grande { grid-row: span 2; }
+.mosaico img { width: 100%; height: 100%; object-fit: cover; }
+.mosaico .lamina:not(.mosaico__grande) img { aspect-ratio: 3 / 2; }
+.mosaico__grande img { aspect-ratio: auto; min-height: 100%; }
+.mosaico .lamina { display: flex; flex-direction: column; }
+.mosaico .lamina img { flex: 1; }
+
+/* Catálogo */
+.tabla-envoltura { overflow-x: auto; margin-top: 24px; background: #fff; border: 1px solid var(--linea); border-radius: var(--radio); }
+.catalogo { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+.catalogo th { padding: 12px 16px; text-align: left; font-weight: 500; color: var(--tenue); border-bottom: 1px solid var(--linea); }
+.catalogo td { padding: 12px 16px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.catalogo tr:last-child td { border-bottom: 0; }
+.catalogo td:first-child { font-weight: 500; color: var(--tinta); }
+.catalogo__nota { display: block; font-weight: 400; color: var(--suave); }
+.hitos__fecha { display: block; margin-bottom: 8px; font-weight: 600; color: var(--tinta); }
+
+/* Pie */
+.pie { position: relative; background: var(--tinta); color: #DBE7F1; }
+.pie > .tri--ancho { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+.pie__logo { width: auto; height: 48px; margin-bottom: 20px; }
+.pie a { color: #fff; }
+.pie a:hover { color: var(--naranja); }
+.pie__interior { display: grid; grid-template-columns: 1.4fr 1.2fr 1fr; gap: 40px; padding-block: 60px 32px; }
+.pie__nombre { font-family: var(--titulos); font-size: 1.25rem; line-height: 1.3; color: #fff; }
+.pie__titulo { font-weight: 600; color: var(--celeste); }
+.pie ul { margin: 0; padding: 0; list-style: none; }
+.pie li { margin-bottom: 8px; }
+.pie__legal { margin: 0 auto; padding-block: 20px 32px; border-top: 1px solid rgba(255, 255, 255, .16); font-size: .875rem; }
+
+/* Pantallas medianas y chicas */
+@media (max-width: 900px) {
+  .tres-columnas, .hitos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .galeria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .galeria--ancho-2, .galeria--ancho-3 { grid-column: auto; }
+  .galeria--alto { grid-row: auto; }
+  .galeria--ancho-2 img, .galeria--ancho-3 img, .galeria--alto img { aspect-ratio: 4 / 3; height: auto; }
+  .galeria--impar { grid-column: span 2; }
+  .galeria--impar img { aspect-ratio: 8 / 3; }
+  .pie__interior { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 760px) {
+  .menu-boton { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid var(--linea); border-radius: var(--radio); background: #fff; color: var(--tinta); font: 500 1rem var(--cuerpo); cursor: pointer; }
+  .menu { display: none; position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; align-items: stretch; gap: 16px; padding: 16px 24px 24px; background: #fff; border-bottom: 1px solid var(--linea); }
+  .menu-abierto .menu { display: flex; }
+  .menu ul { flex-direction: column; gap: 0; }
+  .menu ul a { padding: 12px 0; border-bottom: 1px solid var(--linea); }
+  .dos-columnas, .dos-columnas--imagen, .tres-columnas, .hitos, .galeria, .pie__interior, .mosaico { grid-template-columns: 1fr; }
+  .mosaico__grande { grid-row: auto; }
+  .marca__logo { height: 36px; }
+  .marca__nombre { font-size: 1.125rem; }
+  .galeria__video { grid-row: auto; }
+  .galeria--impar { grid-column: auto; }
+  .galeria--impar img { aspect-ratio: 4 / 3; }
+  .galeria__video video { height: auto; max-height: 560px; }
+  .portada { min-height: 640px; padding-bottom: 48px; }
+  h1 { font-size: 2.25rem; }
+  .bloque { padding-block: 48px; }
+  .ficha div { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portada__video { display: none; }
+  .portada { background: var(--tinta-3) url('../video/terreno-183003.jpg') center / cover; }
+}

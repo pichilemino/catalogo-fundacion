@@ -1,0 +1,94 @@
+/* Catálogo: piezas propias, sobre estilo.css (el mismo de la biblioteca y del tema Colchagua) */
+.encabezado { padding-bottom: 24px; }
+.encabezado .rotulo a { color: inherit; text-decoration: none; }
+.encabezado .rotulo a:hover { text-decoration: underline; }
+
+/* Buscador */
+.buscador { padding: 24px; background: var(--papel); border: 1px solid var(--linea); border-radius: 12px; }
+.buscador__fila { display: flex; gap: 12px; }
+.buscador__q { flex: 1; }
+.buscador input[type="search"], .buscador select {
+  width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid rgba(12, 42, 69, .2); border-radius: var(--radio);
+  background: #fff; font: 400 1.0625rem var(--cuerpo); color: var(--texto);
+}
+.buscador select { min-height: 40px; padding: 0 12px; font-size: .9375rem; }
+.buscador input:focus, .buscador select:focus { outline: 2px solid var(--celeste); outline-offset: 0; border-color: var(--celeste); }
+.buscador__filtros { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 20px; margin-top: 16px; }
+.buscador__filtros label { display: grid; gap: 4px; min-width: 160px; font-size: .8125rem; font-weight: 500; color: var(--suave); }
+.buscador__filtros .buscador__check { display: flex; align-items: center; gap: 8px; min-width: 0; padding-bottom: 10px; font-size: .9375rem; font-weight: 400; color: var(--texto); }
+.buscador .boton { cursor: pointer; font: 600 1rem var(--cuerpo); }
+
+/* Resultados */
+.resultados { padding: 32px 0 80px; }
+.resultados__cab { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; padding-bottom: 12px; border-bottom: 1px solid var(--linea); }
+.resultados__total { margin: 0; font-weight: 500; color: var(--tinta); }
+.resultados__orden { display: flex; gap: 16px; margin: 0; font-size: .9375rem; color: var(--suave); }
+.resultados__orden a { color: var(--tinta-2); }
+.resultados__orden a[aria-current] { font-weight: 600; color: var(--tinta); text-decoration: none; border-bottom: 2px solid var(--naranja); }
+.obras { list-style: none; margin: 0; padding: 0; }
+.obra { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 8px 24px; align-items: baseline; padding: 20px 0; border-bottom: 1px solid var(--linea); }
+.obra__titulo { margin: 0 0 4px; font-size: 1.3125rem; line-height: 1.3; }
+.obra__titulo a { color: var(--tinta); text-decoration: none; }
+.obra__titulo a:hover { color: var(--celeste-t); text-decoration: underline; }
+.obra__datos { margin: 0; color: var(--suave); }
+.obra__datos span::before { content: " · "; }
+.obra__meta { display: grid; justify-items: end; gap: 4px; font-size: .875rem; color: var(--tenue); text-align: right; }
+.formato { display: inline-block; align-self: start; padding: 2px 10px; border-radius: 999px; background: #EAF4FB; color: #1F5E85; font-size: .8125rem; font-weight: 500; white-space: nowrap; }
+.formato--periodico, .formato--revista { background: #FFF0DD; color: #8A4B00; }
+.formato--mapa, .formato--documento, .formato--folleto { background: #E9F7E1; color: #2F6B12; }
+.vacio { padding: 32px 0; color: var(--suave); }
+.paginas { display: flex; justify-content: center; align-items: center; gap: 24px; padding-top: 32px; color: var(--suave); }
+.paginas a { font-weight: 500; }
+
+/* Ficha de la obra */
+.encabezado--obra .formato { margin-bottom: 12px; }
+.obra-subtitulo { display: block; margin-top: 8px; font-size: .55em; line-height: 1.3; color: var(--tinta-2); }
+.vistas { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-bottom: 24px; border-bottom: 1px solid var(--linea); }
+.vistas a { padding: 10px 0; border-bottom: 2px solid transparent; margin-bottom: -1px; color: var(--suave); font-weight: 500; text-decoration: none; }
+.vistas a:hover { color: var(--tinta); }
+.vistas a[aria-current] { color: var(--tinta); border-bottom-color: var(--naranja); }
+.ficha--obra { max-width: 860px; }
+.ficha--obra div { grid-template-columns: 11rem 1fr; }
+.ficha--obra dd { font-weight: 400; }
+.ficha__linea { display: block; }
+.ficha__fuente { color: var(--suave); font-size: .9375rem; word-break: break-word; }
+
+/* Tarjeta catalográfica: como las fichas de cartulina de 7,5 × 12,5 cm */
+.tarjeta-cat { display: grid; grid-template-columns: 96px 1fr; gap: 16px; max-width: 640px; padding: 28px 32px; background: #FFFDF7; border: 1px solid #E8E0CC; border-radius: 4px; box-shadow: 0 1px 0 rgba(12, 42, 69, .06), 0 16px 32px -24px rgba(12, 42, 69, .45); font-size: .9375rem; line-height: 1.55; position: relative; }
+.tarjeta-cat::after { content: ""; position: absolute; left: 50%; bottom: 14px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #fff; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2); }
+.tarjeta-cat__signatura { display: grid; align-content: start; gap: 2px; font-weight: 600; color: var(--tinta); }
+.tarjeta-cat__texto p { margin: 0 0 8px; }
+.tarjeta-cat__encabezamiento { font-weight: 600; color: var(--tinta); }
+.tarjeta-cat__sangria { text-indent: 24px; }
+
+/* Cita */
+.cita-bib { max-width: 760px; padding: 24px; background: var(--papel); border-radius: 12px; }
+.cita-bib__estilo { margin-bottom: 8px; font-size: .875rem; color: var(--tenue); }
+.cita-bib__texto { padding-left: 32px; text-indent: -32px; font-size: 1.0625rem; }
+.cita-bib .boton { cursor: pointer; font: 500 .9375rem var(--cuerpo); }
+
+/* MARC */
+.marc { overflow-x: auto; max-width: 100%; padding: 20px 24px; background: var(--tinta-3); color: #DBE7F1; border-radius: 12px; font: 400 .875rem/1.7 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; white-space: pre-wrap; }
+
+/* Ejemplares */
+.existencias { padding: 48px 0 80px; }
+.existencias h2 { font-size: 1.75rem; }
+.existencias__nota { margin-top: 16px; color: var(--suave); }
+.estado { display: inline-block; padding: 2px 10px; border-radius: 999px; background: #EEF2F6; color: #4A5B6A; font-size: .8125rem; font-weight: 500; }
+.estado--si { background: #E5F3EA; color: #1E6B3A; }
+.tabla-envoltura { overflow-x: auto; margin-top: 16px; background: #fff; border: 1px solid var(--linea); border-radius: var(--radio); }
+.catalogo { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+.catalogo th { padding: 12px 16px; text-align: left; font-weight: 500; color: var(--tenue); border-bottom: 1px solid var(--linea); white-space: nowrap; }
+.catalogo td { padding: 12px 16px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.catalogo tr:last-child td { border-bottom: 0; }
+
+@media (max-width: 760px) {
+  .buscador { padding: 16px; }
+  .buscador__fila { flex-direction: column; }
+  .buscador__filtros label { min-width: 0; flex: 1 1 140px; }
+  .obra { grid-template-columns: 1fr; gap: 6px; }
+  .obra__meta { justify-items: start; text-align: left; }
+  .ficha--obra div { grid-template-columns: 1fr; }
+  .tarjeta-cat { grid-template-columns: 1fr; padding: 20px; }
+  .tarjeta-cat__signatura { display: flex; gap: 8px; }
+}

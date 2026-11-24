@@ -1,0 +1,61 @@
+/* Panel de administración: usa los mismos colores y tipos del sitio */
+.admin { background: var(--papel); }
+.admin-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; }
+.admin-menu a { padding: 8px 0; border-bottom: 2px solid transparent; color: var(--tinta); font-weight: 500; text-decoration: none; }
+.admin-menu a[aria-current="page"], .admin-menu a:hover { border-bottom-color: var(--naranja); }
+.admin-menu form { margin: 0; }
+.admin-salir { padding: 8px 12px; border: 1px solid var(--linea); border-radius: var(--radio); background: #fff; color: var(--suave); font: inherit; cursor: pointer; }
+.admin-cuerpo { padding-block: 40px 80px; max-width: 980px; }
+.admin-cuerpo h1 { font-size: 2.25rem; }
+.admin-cuerpo h2 { font-size: 1.5rem; margin-top: 40px; }
+.admin-ayuda { color: var(--suave); }
+.admin-caja { margin: 0 0 16px; padding: 20px 24px; background: #fff; border: 1px solid var(--linea); border-radius: 12px; }
+fieldset.admin-caja { display: grid; gap: 16px; }
+.admin-caja legend { padding: 0 8px; font-family: var(--titulos); font-size: 1.375rem; color: var(--tinta); }
+.admin label { display: grid; gap: 6px; font-size: .875rem; font-weight: 500; color: var(--suave); }
+.admin input[type="text"], .admin input[type="password"], .admin input[type="number"], .admin textarea, .admin select {
+  width: 100%; padding: 10px 12px; border: 1px solid rgba(12, 42, 69, .2); border-radius: var(--radio); background: #fff;
+  font: 400 1rem/1.5 var(--cuerpo); color: var(--texto);
+}
+.admin textarea { resize: vertical; }
+.admin input:focus, .admin textarea:focus, .admin select:focus { outline: 2px solid var(--celeste); outline-offset: 0; border-color: var(--celeste); }
+.admin .admin-check { display: flex; align-items: center; gap: 8px; align-self: end; padding-bottom: 12px; font-weight: 400; color: var(--texto); }
+.admin-acceso { display: grid; gap: 16px; max-width: 420px; margin: 40px auto; }
+.admin-acceso h1 { margin: 0; }
+.admin-subir { display: grid; gap: 16px; }
+.admin-subir h2 { margin: 0; }
+.admin-fila { display: grid; gap: 12px 16px; align-items: end; }
+.admin-fila--hito { grid-template-columns: 180px 1fr auto auto; }
+.admin-fila--foto { grid-template-columns: 96px 72px 1fr 1fr auto; }
+.admin-fila--foto img { width: 96px; height: 72px; object-fit: cover; border-radius: 4px; }
+.admin-tabla { overflow-x: auto; }
+.admin-fila--obra { grid-template-columns: 2fr 1.3fr 80px 120px 1.5fr 80px; min-width: 820px; padding: 4px 0; }
+.admin-fila--cab { font-size: .875rem; font-weight: 500; color: var(--tenue); }
+.admin-guardar { position: sticky; bottom: 0; padding: 16px 0; background: linear-gradient(transparent, var(--papel) 30%); }
+.admin-aviso { padding: 12px 16px; border-left: 4px solid var(--verde); background: #fff; border-radius: var(--radio); }
+.admin-aviso--error { border-left-color: #C0392B; }
+.admin button.boton { cursor: pointer; font: 600 1rem var(--cuerpo); }
+@media (max-width: 760px) {
+  .admin-fila--hito, .admin-fila--foto { grid-template-columns: 1fr; }
+  .admin-menu { position: static; }
+}
+
+/* Catálogo: piezas del panel */
+.admin-titulo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; }
+.admin-titulo h1 { margin: 0; }
+.admin-cuenta { font-family: var(--cuerpo); font-size: 1rem; font-weight: 500; color: var(--tenue); }
+.admin-acciones { display: flex; gap: 12px; }
+.admin-filtro { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.admin-filtro input { flex: 1 1 260px; min-height: 44px; padding: 0 14px; border: 1px solid rgba(12, 42, 69, .2); border-radius: var(--radio); font: inherit; }
+.admin-filtro select { width: auto; }
+.admin-cuerpo { max-width: 1180px; }
+.admin-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+.admin-rejilla legend { grid-column: 1 / -1; }
+.admin-ancho { grid-column: 1 / -1; }
+.admin label small { font-weight: 400; color: var(--tenue); }
+.admin-fila--ej { grid-template-columns: 1.6fr 1fr 1.4fr 170px 1.4fr 80px; min-width: 860px; padding: 4px 0; }
+.admin-borrar { margin-left: 16px; padding: 10px 16px; border: 1px solid rgba(192, 57, 43, .35); border-radius: var(--radio); background: #fff; color: #A23224; font: 500 .9375rem var(--cuerpo); cursor: pointer; }
+.admin-opciones { margin-top: 16px; }
+.admin details summary { cursor: pointer; font-weight: 500; color: var(--tinta); }
+.admin details .marc { margin-top: 12px; }
+@media (max-width: 760px) { .admin-rejilla { grid-template-columns: 1fr; } }
