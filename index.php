@@ -32,50 +32,63 @@ require __DIR__ . '/inc/cabecera.php';
 $conteo = db()->query("SELECT coleccion, COUNT(*) n FROM registros GROUP BY coleccion")->fetchAll(PDO::FETCH_KEY_PAIR);
 ?>
 
-<header class="encabezado envoltura">
-    <p class="rotulo"><span class="tri" aria-hidden="true"><i></i><i></i><i></i></span>Catálogo</p>
-    <h1><?= $p['coleccion'] ? e(COLECCIONES[$p['coleccion']]) : 'Buscar en la colección' ?></h1>
-    <p class="encabezado__bajada">
-        <?php if ($p['coleccion'] === 'hemeroteca') : ?>
-            Periódicos y revistas de Colchagua, Cardenal Caro y el país, con los tomos que guarda la Fundación.
-        <?php elseif ($p['coleccion'] === 'biblioteca') : ?>
-            Libros, folletos y documentos sobre Pichilemu, Cardenal Caro y Colchagua.
-        <?php else : ?>
-            Libros, periódicos y revistas de la Biblioteca de la Fundación y de la Hemeroteca Archibaldo Morales Villanueva, para consultar en sala.
+<section class="busqueda<?= $buscando ? ' busqueda--compacta' : '' ?>">
+    <div class="envoltura">
+        <p class="rotulo"><span class="tri" aria-hidden="true"><i></i><i></i><i></i></span><?= $p['coleccion'] ? 'Catálogo' : 'Biblioteca y Hemeroteca de la Fundación' ?></p>
+        <h1><?= $p['coleccion'] ? e(COLECCIONES[$p['coleccion']]) : 'Buscar en la colección' ?></h1>
+        <?php if (!$buscando) : ?>
+            <p class="busqueda__bajada">Libros, periódicos y revistas sobre Pichilemu, Cardenal Caro y Colchagua, para consultar en sala.</p>
         <?php endif; ?>
-    </p>
-</header>
-
-<section class="envoltura">
-    <form class="buscador" method="get" action="index.php" role="search">
-        <div class="buscador__fila">
-            <label class="buscador__q"><span class="screen-reader-text">Buscar</span>
-                <input type="search" name="q" value="<?= e($p['q']) ?>" placeholder="Título, autor, materia, año…" autofocus>
-            </label>
-            <button class="boton" type="submit">Buscar</button>
-        </div>
-        <div class="buscador__filtros">
-            <label>Colección
-                <select name="coleccion">
-                    <option value="">Todas</option>
-                    <?php foreach (COLECCIONES as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['coleccion'] === $k ? ' selected' : '' ?>><?= e($k === 'hemeroteca' ? 'Hemeroteca' : $v) ?></option><?php endforeach; ?>
-                </select>
-            </label>
-            <label>Formato
-                <select name="formato">
-                    <option value="">Todos</option>
-                    <?php foreach (FORMATOS as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['formato'] === $k ? ' selected' : '' ?>><?= e($v) ?></option><?php endforeach; ?>
-                </select>
-            </label>
-            <label>Buscar en
-                <select name="campo">
-                    <?php foreach (CAMPOS_BUSQUEDA as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['campo'] === $k ? ' selected' : '' ?>><?= e($v) ?></option><?php endforeach; ?>
-                </select>
-            </label>
-            <label class="buscador__check"><input type="checkbox" name="exacta" value="1"<?= $p['exacta'] ? ' checked' : '' ?>> Frase exacta</label>
-        </div>
-    </form>
+        <form class="buscador" method="get" action="index.php" role="search">
+            <div class="buscador__fila">
+                <label class="buscador__q"><span class="screen-reader-text">Buscar</span>
+                    <input type="search" name="q" value="<?= e($p['q']) ?>" placeholder="Título, autor, materia o año"<?= $buscando ? '' : ' autofocus' ?>>
+                </label>
+                <button class="boton" type="submit">Buscar</button>
+            </div>
+            <div class="buscador__filtros">
+                <label>Colección
+                    <select name="coleccion">
+                        <option value="">Todas</option>
+                        <?php foreach (COLECCIONES as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['coleccion'] === $k ? ' selected' : '' ?>><?= e($k === 'hemeroteca' ? 'Hemeroteca' : $v) ?></option><?php endforeach; ?>
+                    </select>
+                </label>
+                <label>Formato
+                    <select name="formato">
+                        <option value="">Todos</option>
+                        <?php foreach (FORMATOS as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['formato'] === $k ? ' selected' : '' ?>><?= e($v) ?></option><?php endforeach; ?>
+                    </select>
+                </label>
+                <label>Buscar en
+                    <select name="campo">
+                        <?php foreach (CAMPOS_BUSQUEDA as $k => $v) : ?><option value="<?= e($k) ?>"<?= $p['campo'] === $k ? ' selected' : '' ?>><?= e($v) ?></option><?php endforeach; ?>
+                    </select>
+                </label>
+                <label class="buscador__check"><input type="checkbox" name="exacta" value="1"<?= $p['exacta'] ? ' checked' : '' ?>> Frase exacta</label>
+            </div>
+        </form>
+    </div>
 </section>
+
+<?php if (!$buscando) : ?>
+    <section class="envoltura explorar" aria-label="Colecciones">
+        <a class="explorar__item" href="index.php?coleccion=biblioteca">
+            <span class="explorar__cifra cifra"><?= number_format((int) ($conteo['biblioteca'] ?? 0), 0, ',', '.') ?></span>
+            <span class="explorar__nombre">Biblioteca</span>
+            <span class="explorar__texto">Libros, folletos y documentos sobre la zona</span>
+        </a>
+        <a class="explorar__item explorar__item--hemeroteca" href="index.php?coleccion=hemeroteca">
+            <span class="explorar__cifra cifra"><?= number_format((int) ($conteo['hemeroteca'] ?? 0), 0, ',', '.') ?></span>
+            <span class="explorar__nombre">Hemeroteca Archibaldo Morales Villanueva</span>
+            <span class="explorar__texto">Periódicos y revistas, con sus tomos empastados</span>
+        </a>
+        <a class="explorar__item explorar__item--digital" href="<?= e(COLECCIONES_URL) ?>">
+            <span class="explorar__cifra" aria-hidden="true">↗</span>
+            <span class="explorar__nombre">Colecciones digitales</span>
+            <span class="explorar__texto">Documentos, afiches y fotografías digitalizados</span>
+        </a>
+    </section>
+<?php endif; ?>
 
 <section class="envoltura resultados" aria-live="polite">
     <div class="resultados__cab">
@@ -83,7 +96,7 @@ $conteo = db()->query("SELECT coleccion, COUNT(*) n FROM registros GROUP BY cole
             <?php if ($buscando) : ?>
                 <?= $total === 0 ? 'No encontramos obras con esa búsqueda' : ($total === 1 ? '1 obra' : number_format($total, 0, ',', '.') . ' obras') ?>
             <?php else : ?>
-                Últimas incorporaciones · <?= number_format((int) array_sum($conteo), 0, ',', '.') ?> obras en el catálogo
+                Últimas incorporaciones
             <?php endif; ?>
         </p>
         <?php if ($buscando && $total > 1) : ?>

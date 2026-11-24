@@ -51,7 +51,8 @@ require __DIR__ . '/inc/cabecera.php';
     <p class="encabezado__bajada"><?= e($r['responsabilidad'] ?: $r['autor']) ?></p>
 </header>
 
-<section class="envoltura">
+<section class="envoltura obra-cuerpo">
+    <div class="obra-cuerpo__principal">
     <nav class="vistas" aria-label="Formato de la ficha">
         <?php foreach ($vistas as $k => $v) : if ($k === 'marc' && trim((string) $r['marc']) === '') { continue; } ?>
             <a href="registro.php?id=<?= (int) $r['id'] ?>&amp;vista=<?= e($k) ?>"<?= $vista === $k ? ' aria-current="page"' : '' ?>><?= e($v) ?></a>
@@ -69,7 +70,6 @@ require __DIR__ . '/inc/cabecera.php';
                 'Impresión' => $r['impresion'], 'Descripción' => $r['descripcion'],
                 'Periodicidad' => $r['periodicidad'], 'Años en la colección' => $r['cobertura'],
                 'Serie' => $r['serie'], 'ISBN' => $r['isbn'], 'ISSN' => $r['issn'],
-                'Clasificación' => signatura($r),
             ];
             foreach ($filas as $etq => $val) :
                 if (trim((string) $val) === '') {
@@ -116,6 +116,28 @@ require __DIR__ . '/inc/cabecera.php';
     <?php else : ?>
         <pre class="marc"><?= e($r['marc']) ?></pre>
     <?php endif; ?>
+    </div>
+
+    <aside class="tejuelo" aria-label="Ubicación">
+        <p class="tejuelo__rotulo">Signatura</p>
+        <?php $sig = array_filter([$r['dewey'], $r['cutter'], $r['formato'] === 'libro' ? $r['anio'] : '']); ?>
+        <?php if ($sig) : ?>
+            <p class="tejuelo__signatura cifra"><?php foreach ($sig as $s) : ?><span><?= e($s) ?></span><?php endforeach; ?></p>
+        <?php else : ?>
+            <p class="tejuelo__sin">Sin clasificar aún</p>
+        <?php endif; ?>
+        <dl class="tejuelo__datos">
+            <div><dt>Colección</dt><dd><?= e($hemer ? 'Hemeroteca' : 'Biblioteca') ?></dd></div>
+            <div><dt><?= $hemer ? 'Tomos' : 'Ejemplares' ?></dt><dd class="cifra"><?= count($ejs) ?></dd></div>
+            <?php if ($ejs) : $disp = count(array_filter($ejs, fn ($x) => $x['estado'] === 'Disponible')); ?>
+                <div><dt>Disponibles</dt><dd class="cifra"><?= $disp ?> de <?= count($ejs) ?></dd></div>
+            <?php endif; ?>
+            <?php if ($r['anio']) : ?><div><dt>Año</dt><dd class="cifra"><?= e($r['anio']) ?></dd></div><?php endif; ?>
+        </dl>
+        <p class="tejuelo__nota">Se consulta en sala. Indica la signatura al pedirlo.</p>
+        <a class="tejuelo__enlace" href="registro.php?id=<?= (int) $r['id'] ?>&amp;vista=cita">Citar esta obra</a>
+        <?php if ($r['enlace']) : ?><a class="tejuelo__enlace" href="<?= e($r['enlace']) ?>">Ver la versión digital ↗</a><?php endif; ?>
+    </aside>
 </section>
 
 <section class="envoltura existencias">
@@ -140,7 +162,7 @@ require __DIR__ . '/inc/cabecera.php';
     <?php else : ?>
         <p class="vacio">Esta obra está catalogada, pero sus ejemplares todavía se están ordenando.</p>
     <?php endif; ?>
-    <p class="existencias__nota">La colección se consulta en sala. <a href="index.php">Volver a buscar</a></p>
+    <p class="existencias__nota"><a href="index.php">← Volver a buscar</a></p>
 </section>
 
 <script>
