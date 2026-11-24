@@ -10,8 +10,13 @@ const SITIO_NOMBRE   = 'Catálogo de la Biblioteca Región de Colchagua';
 const BIBLIOTECA_URL = 'https://biblioteca.colchagua.org/';
 const COLECCIONES_URL = 'https://colecciones.colchagua.org/';
 const FUNDACION_URL  = 'https://colchagua.org/';
+const CONTACTO_URL   = 'https://colchagua.org/contacto/';
+const SITIO_CORTO    = 'Biblioteca Región de Colchagua';   // igual que en el sitio de la biblioteca
+/** Menú compartido con el sitio de la biblioteca: el catálogo es una sección más. */
+const MENU_BIBLIOTECA = ['' => 'Inicio', 'coleccion.php' => 'Colección', 'hemeroteca.php' => 'Hemeroteca', 'sede.php' => 'La sede'];
 const BASE_ARCHIVO   = __DIR__ . '/../data/catalogo.sqlite';
 const POR_PAGINA     = 20;
+const PORTADAS_DIR   = __DIR__ . '/../portadas';
 
 const COLECCIONES = ['biblioteca' => 'Biblioteca', 'hemeroteca' => 'Hemeroteca Archibaldo Morales Villanueva'];
 const FORMATOS = [
@@ -80,6 +85,11 @@ function db(): PDO
         );
         CREATE INDEX IF NOT EXISTS ej_registro ON ejemplares (registro_id);
         SQL);
+    // Columnas agregadas después de la primera versión (catálogos ya creados se actualizan solos).
+    $cols = array_column($pdo->query('PRAGMA table_info(registros)')->fetchAll(), 'name');
+    if (!in_array('portada', $cols, true)) {
+        $pdo->exec('ALTER TABLE registros ADD COLUMN portada TEXT');
+    }
     return $pdo;
 }
 
@@ -186,4 +196,48 @@ function titulo_completo(array $r): string
 function signatura(array $r): string
 {
     return trim(implode(' ', array_filter([$r['dewey'], $r['cutter'], $r['formato'] === 'libro' ? $r['anio'] : ''])));
+}
+
+/**
+ * Guarda una portada (bytes de una imagen) para un registro y devuelve su ruta relativa ('portadas/…jpg'), o '' si no es imagen.
+ * Si el servidor tiene GD, la reduce a 600 px de ancho en JPEG; así cada portada pesa poco. Borra la portada anterior.
+ */
+function portada_guardar(int $id, string $bytes): string
+{
+    $info = @getimagesizefromstring($bytes);
+    $tipos = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    if (!$info || !isset($tipos[$info['mime']]) || strlen($bytes) > 8_000_000) {
+        return '';
+    }
+    if (!is_dir(PORTADAS_DIR)) {
+        mkdir(PORTADAS_DIR, 0755, true);
+    }
+    $ext = $tipos[$info['mime']];
+    if (function_exists('imagecreatefromstring') && ($img = @imagecreatefromstring($bytes))) {
+        $w = imagesx($img);
+        if ($w > 600) {
+            $img = imagescale($img, 600) ?: $img;
+        }
+        ob_start();
+        imagejpeg($img, null, 82);
+        $bytes = (string) ob_get_clean();
+        $ext   = 'jpg';
+    }
+    $nombre = $id . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+    if (file_put_contents(PORTADAS_DIR . '/' . $nombre, $bytes) === false) {
+        return '';
+    }
+    portada_borrar($id);
+    db()->prepare('UPDATE registros SET portada = ? WHERE id = ?')->execute(['portadas/' . $nombre, $id]);
+    return 'portadas/' . $nombre;
+}
+
+/** Quita la portada de un registro (y su archivo). */
+function portada_borrar(int $id): void
+{
+    $r = registro($id);
+    if ($r && !empty($r['portada']) && str_starts_with($r['portada'], 'portadas/')) {
+        @unlink(PORTADAS_DIR . '/' . basename($r['portada']));
+    }
+    db()->prepare('UPDATE registros SET portada = NULL WHERE id = ?')->execute([$id]);
 }

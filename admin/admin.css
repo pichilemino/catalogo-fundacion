@@ -59,3 +59,20 @@ fieldset.admin-caja { display: grid; gap: 16px; }
 .admin details summary { cursor: pointer; font-weight: 500; color: var(--tinta); }
 .admin details .marc { margin-top: 12px; }
 @media (max-width: 760px) { .admin-rejilla { grid-template-columns: 1fr; } }
+
+/* Otros catálogos */
+.admin-externos { display: grid; grid-template-columns: 220px 180px minmax(0, 1fr) auto; gap: 16px; align-items: end; }
+.externos { list-style: none; margin: 0 0 16px; padding: 0; background: #fff; border: 1px solid var(--linea); border-radius: 12px; }
+.externo { display: grid; grid-template-columns: 32px 56px minmax(0, 1fr); gap: 16px; align-items: start; padding: 16px 24px; border-top: 1px solid var(--linea); }
+.externo:first-child { border-top: 0; }
+.externo__marca { padding-top: 4px; }
+.externo__portada { width: 56px; height: 80px; background: var(--papel); border-radius: 4px; overflow: hidden; }
+.externo__portada img { width: 100%; height: 100%; object-fit: cover; }
+.externo__titulo { margin: 0 0 4px; font-family: var(--titulos); font-size: 1.125rem; color: var(--tinta); }
+.externo__datos { margin: 0; font-size: .875rem; color: var(--suave); }
+.externo__ya { margin: 8px 0 0; font-size: .875rem; color: #8A4B00; }
+.admin-portada { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 24px; align-items: start; }
+.admin-portada__img { width: 120px; aspect-ratio: 2 / 3; background: var(--papel); border-radius: 4px; overflow: hidden; display: grid; place-items: center; color: var(--tenue); font-size: .8125rem; text-align: center; }
+.admin-portada__img img { width: 100%; height: 100%; object-fit: cover; }
+.admin-portada__acciones { display: grid; gap: 12px; }
+@media (max-width: 760px) { .admin-externos { grid-template-columns: 1fr; } }

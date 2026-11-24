@@ -119,6 +119,7 @@ require __DIR__ . '/inc/cabecera.php';
     </div>
 
     <aside class="tejuelo" aria-label="Ubicación">
+        <?php if (!empty($r['portada'])) : ?><img class="tejuelo__portada" src="<?= e($r['portada']) ?>" alt="Portada de <?= e($r['titulo']) ?>"><?php endif; ?>
         <p class="tejuelo__rotulo">Signatura</p>
         <?php $sig = array_filter([$r['dewey'], $r['cutter'], $r['formato'] === 'libro' ? $r['anio'] : '']); ?>
         <?php if ($sig) : ?>

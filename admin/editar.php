@@ -2,6 +2,7 @@
 /** Catalogar: crear o editar una obra y sus ejemplares (o tomos, en la hemeroteca). */
 declare(strict_types=1);
 require __DIR__ . '/comun.php';
+require __DIR__ . '/../inc/externos.php';
 exigir_sesion();
 
 $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
@@ -42,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ir('editar.php' . ($id ? '?id=' . $id : ''));
     }
     if (($_POST['accion'] ?? '') === 'borrar' && $id) {
+        portada_borrar($id);
         db()->prepare('DELETE FROM registros WHERE id = ?')->execute([$id]);
         avisar('Obra eliminada.');
         ir('index.php');
@@ -80,7 +82,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ins->execute([$id, $f['codigo'], $f['descripcion'], $f['ubicacion'], $f['estado'], $f['nota'], $orden++]);
     }
     $pdo->commit();
-    avisar('Obra guardada.');
+    // Portada (opcional): quitar, subir una imagen o traerla de Open Library por ISBN.
+    $aviso = 'Obra guardada.';
+    if (!empty($_POST['portada_quitar'])) {
+        portada_borrar($id);
+    } elseif (!empty($_FILES['portada']['tmp_name']) && ($_FILES['portada']['error'] ?? 1) === UPLOAD_ERR_OK) {
+        $aviso .= portada_guardar($id, (string) file_get_contents($_FILES['portada']['tmp_name'])) ? '' : ' La portada no se guardó: usa una foto JPG, PNG o WebP de menos de 8 MB.';
+    } elseif (!empty($_POST['portada_ol'])) {
+        $url   = portada_por_isbn($datos['isbn']);
+        $bytes = $url ? http_get($url, 12) : '';
+        $aviso .= ($bytes !== '' && portada_guardar($id, $bytes)) ? ' Portada traída de Open Library.' : ' Open Library no tiene portada para ese ISBN.';
+    }
+    avisar($aviso);
     ir('editar.php?id=' . $id);
 }
 
@@ -92,7 +105,7 @@ admin_cabecera($id ? 'Editar obra' : 'Nueva obra', $id ? 'obras' : 'nueva');
     <h1><?= $id ? e($r['titulo']) : 'Nueva obra' ?></h1>
     <?php if ($id) : ?><div class="admin-acciones"><a class="boton boton--claro" href="../registro.php?id=<?= $id ?>">Ver en el catálogo ↗</a></div><?php endif; ?>
 </div>
-<form method="post" class="admin-ficha">
+<form method="post" class="admin-ficha" enctype="multipart/form-data">
     <?= campo_token() ?>
     <input type="hidden" name="id" value="<?= $id ?>">
     <fieldset class="admin-caja admin-rejilla">
@@ -115,6 +128,18 @@ admin_cabecera($id ? 'Editar obra' : 'Nueva obra', $id ? 'obras' : 'nueva');
             <?php endforeach; ?>
         </fieldset>
     <?php endforeach; ?>
+
+    <fieldset class="admin-caja">
+        <legend>Portada <small>(opcional)</small></legend>
+        <div class="admin-portada">
+            <div class="admin-portada__img"><?php if (!empty($r['portada'])) : ?><img src="../<?= e($r['portada']) ?>" alt="Portada actual"><?php else : ?>Sin portada<?php endif; ?></div>
+            <div class="admin-portada__acciones">
+                <label>Subir una foto de la portada (JPG, PNG o WebP)<input type="file" name="portada" accept="image/jpeg,image/png,image/webp"></label>
+                <label class="admin-check"><input type="checkbox" name="portada_ol" value="1"> Buscarla en Open Library por el ISBN</label>
+                <?php if (!empty($r['portada'])) : ?><label class="admin-check"><input type="checkbox" name="portada_quitar" value="1"> Quitar la portada</label><?php endif; ?>
+            </div>
+        </div>
+    </fieldset>
 
     <fieldset class="admin-caja">
         <legend>Ejemplares o tomos</legend>

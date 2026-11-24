@@ -1,3 +1,5 @@
 # La base del catálogo y la clave del panel viven solo en el servidor
 data/*
 !data/.htaccess
+portadas/*
+!portadas/.htaccess

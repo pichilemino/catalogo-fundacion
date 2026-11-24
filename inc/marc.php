@@ -163,3 +163,40 @@ function marc_a_registro(array $reg): array
         'marc'            => $marc,
     ];
 }
+
+/** Convierte MARCXML (respuestas SRU de Alma o de la Library of Congress) en registros MARC como los del lector de texto. */
+function marc_desde_xml(string $xml): array
+{
+    $dom = new DOMDocument();
+    if ($xml === '' || !@$dom->loadXML($xml, LIBXML_NONET)) {
+        return [];
+    }
+    $ns   = 'http://www.loc.gov/MARC21/slim';
+    $regs = [];
+    foreach ($dom->getElementsByTagNameNS($ns, 'record') as $rec) {
+        $campos = [];
+        foreach ($rec->childNodes as $n) {
+            if (!$n instanceof DOMElement) {
+                continue;
+            }
+            if ($n->localName === 'leader') {
+                $campos[] = ['tag' => 'LDR', 'ind' => '##', 'valor' => $n->textContent, 'sub' => []];
+            } elseif ($n->localName === 'controlfield') {
+                $campos[] = ['tag' => $n->getAttribute('tag'), 'ind' => '##', 'valor' => $n->textContent, 'sub' => []];
+            } elseif ($n->localName === 'datafield') {
+                $ind = str_replace(' ', '#', str_pad($n->getAttribute('ind1'), 1) . str_pad($n->getAttribute('ind2'), 1));
+                $sub = [];
+                $txt = [];
+                foreach ($n->getElementsByTagNameNS($ns, 'subfield') as $s) {
+                    $sub[] = [$s->getAttribute('code'), trim($s->textContent)];
+                    $txt[] = '|' . $s->getAttribute('code') . ' ' . trim($s->textContent);
+                }
+                $campos[] = ['tag' => $n->getAttribute('tag'), 'ind' => $ind, 'valor' => implode(' ', $txt), 'sub' => $sub];
+            }
+        }
+        if (marc_primero($campos, '245')) {
+            $regs[] = $campos;
+        }
+    }
+    return $regs;
+}

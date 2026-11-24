@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 require __DIR__ . '/comun.php';
-require __DIR__ . '/../inc/marc.php';
+require __DIR__ . '/../inc/externos.php';
 exigir_sesion();
 
 $texto  = '';
@@ -27,39 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $regs = array_map('marc_a_registro', marc_leer_texto($texto));
 
     if ($accion === 'importar' && $regs) {
-        $elegidos  = array_map('intval', (array) ($_POST['elegir'] ?? []));
-        $coleccion = post('coleccion', 20);
-        $crear_ej  = !empty($_POST['crear_ejemplar']);
-        $nuevos = $actualizados = 0;
-        $pdo = db();
-        $pdo->beginTransaction();
-        $buscar = $pdo->prepare('SELECT id FROM registros WHERE fuente_id = ? AND fuente_id <> ""');
-        $ins_ej = $pdo->prepare("INSERT INTO ejemplares (registro_id, descripcion, estado, orden) VALUES (?, 'c.1', 'En proceso técnico', 0)");
-        foreach ($regs as $i => $reg) {
-            if (!in_array($i, $elegidos, true)) {
-                continue;
-            }
-            if (isset(COLECCIONES[$coleccion])) {
-                $reg['coleccion'] = $coleccion;
-            }
-            $buscar->execute([$reg['fuente_id']]);
-            $existente = $buscar->fetchColumn();
-            if ($existente) {
-                // Se actualizan los datos bibliográficos; los enlaces y ejemplares propios se conservan.
-                $actual = registro((int) $existente);
-                $reg['enlace'] = $actual['enlace'];
-                $reg['coleccion'] = $actual['coleccion'];
-                registro_guardar($reg, (int) $existente);
-                $actualizados++;
-            } else {
-                $nid = registro_guardar($reg);
-                if ($crear_ej) {
-                    $ins_ej->execute([$nid]);
-                }
-                $nuevos++;
-            }
-        }
-        $pdo->commit();
+        $elegidos = array_map('intval', (array) ($_POST['elegir'] ?? []));
+        $sel      = array_values(array_filter($regs, fn ($i) => in_array($i, $elegidos, true), ARRAY_FILTER_USE_KEY));
+        [$nuevos, $actualizados] = importar_registros($sel, post('coleccion', 20), !empty($_POST['crear_ejemplar']), !empty($_POST['portadas']));
         avisar("Importación lista: $nuevos obras nuevas" . ($actualizados ? " y $actualizados actualizadas" : '') . '.');
         ir('index.php');
     }
@@ -68,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 admin_cabecera('Importar', 'importar');
 ?>
-<h1>Importar registros</h1>
+<h1>Importar desde la Biblioteca Nacional</h1>
 
 <?php if (!$vista) : ?>
     <p class="admin-ayuda">Busca la obra en <a href="https://www.bncatalogo.cl/" rel="noopener">el catálogo de la Biblioteca Nacional</a>, márcala y usa «Guardar o Enviar» con el formato de etiquetas MARC. Pega aquí el texto del correo que llega (puede traer muchos registros) o súbelo como archivo de texto.</p>
@@ -108,6 +78,7 @@ admin_cabecera('Importar', 'importar');
         <div class="admin-caja admin-rejilla admin-opciones">
             <label>Colección<select name="coleccion"><option value="">Según el registro (libros a Biblioteca, seriadas a Hemeroteca)</option><?php foreach (COLECCIONES as $k => $v) : ?><option value="<?= e($k) ?>"><?= e($v) ?></option><?php endforeach; ?></select></label>
             <label class="admin-check"><input type="checkbox" name="crear_ejemplar" value="1" checked> Crear el ejemplar «c.1» en proceso técnico para cada obra nueva</label>
+            <label class="admin-check"><input type="checkbox" name="portadas" value="1" checked> Buscar la portada en Open Library por ISBN</label>
         </div>
         <div class="admin-guardar"><button class="boton" name="accion" value="importar">Importar los marcados</button> <a href="importar.php">Volver a empezar</a></div>
     </form>

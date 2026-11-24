@@ -71,7 +71,7 @@ admin_cabecera('Obras', 'obras');
 ?>
 <div class="admin-titulo">
     <h1>Obras <span class="admin-cuenta"><?= number_format($total, 0, ',', '.') ?></span></h1>
-    <div class="admin-acciones"><a class="boton" href="editar.php">Nueva obra</a><a class="boton boton--claro" href="importar.php">Importar registros</a></div>
+    <div class="admin-acciones"><a class="boton" href="editar.php">Nueva obra</a><a class="boton boton--claro" href="externos.php">Otros catálogos</a><a class="boton boton--claro" href="importar.php">Importar desde la BN</a></div>
 </div>
 <form method="get" class="admin-filtro">
     <input type="search" name="q" value="<?= e($p['q']) ?>" placeholder="Buscar por título, autor, materia…" aria-label="Buscar">

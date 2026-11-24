@@ -46,7 +46,9 @@
 .resultados__orden a { color: var(--tinta-2); }
 .resultados__orden a[aria-current] { font-weight: 600; color: var(--tinta); text-decoration: none; border-bottom: 2px solid var(--naranja); }
 .obras { list-style: none; margin: 0; padding: 0; }
-.obra { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 8px 24px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid var(--linea); }
+.obra { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 8px 24px; align-items: start; padding: 24px 0; border-bottom: 1px solid var(--linea); }
+.obra__lado { display: grid; gap: 8px; justify-items: start; }
+.obra__portada { width: 64px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 2px; box-shadow: 0 1px 0 rgba(12, 42, 69, .08), 0 8px 16px -12px rgba(12, 42, 69, .5); }
 .obra__titulo { margin: 0 0 4px; font-size: 1.25rem; line-height: 1.3; }
 .obra__titulo a { color: var(--tinta); text-decoration: none; }
 .obra__titulo a:hover { color: var(--celeste-t); text-decoration: underline; }
@@ -68,6 +70,7 @@
 /* Ficha en dos columnas: datos a la izquierda, tejuelo (signatura y disponibilidad) a la derecha */
 .obra-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 288px; gap: 48px; align-items: start; }
 .tejuelo { position: sticky; top: 96px; padding: 24px; background: var(--papel); border-radius: 12px; }
+.tejuelo__portada { display: block; width: 100%; max-width: 200px; margin: 0 auto 24px; border-radius: 2px; box-shadow: 0 1px 0 rgba(12, 42, 69, .08), 0 24px 40px -28px rgba(12, 42, 69, .55); }
 .tejuelo__rotulo { margin: 0 0 8px; font-size: .875rem; color: var(--tenue); }
 .tejuelo__signatura { display: grid; justify-items: center; gap: 4px; margin: 0 0 24px; padding: 16px; background: #fff; border: 1px solid var(--linea); border-top: 4px solid var(--naranja); border-radius: 4px; font-size: 1.25rem; font-weight: 600; color: var(--tinta); box-shadow: 0 1px 2px rgba(12, 42, 69, .06); }
 .tejuelo__sin { margin: 0 0 24px; color: var(--suave); }

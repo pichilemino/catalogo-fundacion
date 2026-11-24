@@ -112,7 +112,10 @@ $conteo = db()->query("SELECT coleccion, COUNT(*) n FROM registros GROUP BY cole
         <ol class="obras" start="<?= ($p['pagina'] - 1) * POR_PAGINA + 1 ?>">
             <?php foreach ($filas as $r) : ?>
                 <li class="obra">
-                    <span class="obra__formato formato formato--<?= e($r['formato']) ?>"><?= e(FORMATOS[$r['formato']] ?? $r['formato']) ?></span>
+                    <span class="obra__lado">
+                        <?php if (!empty($r['portada'])) : ?><img class="obra__portada" src="<?= e($r['portada']) ?>" alt="" loading="lazy"><?php endif; ?>
+                        <span class="formato formato--<?= e($r['formato']) ?>"><?= e(FORMATOS[$r['formato']] ?? $r['formato']) ?></span>
+                    </span>
                     <div class="obra__cuerpo">
                         <h2 class="obra__titulo"><a href="registro.php?id=<?= (int) $r['id'] ?>"><?= e(titulo_completo($r)) ?></a></h2>
                         <p class="obra__datos">

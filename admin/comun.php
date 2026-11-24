@@ -85,7 +85,8 @@ function admin_cabecera(string $titulo, string $actual = ''): void
             <nav class="admin-menu" aria-label="Secciones">
                 <a href="index.php"<?= $actual === 'obras' ? ' aria-current="page"' : '' ?>>Obras</a>
                 <a href="editar.php"<?= $actual === 'nueva' ? ' aria-current="page"' : '' ?>>Nueva obra</a>
-                <a href="importar.php"<?= $actual === 'importar' ? ' aria-current="page"' : '' ?>>Importar</a>
+                <a href="externos.php"<?= $actual === 'externos' ? ' aria-current="page"' : '' ?>>Otros catálogos</a>
+                <a href="importar.php"<?= $actual === 'importar' ? ' aria-current="page"' : '' ?>>Importar desde la BN</a>
                 <form method="post" action="index.php"><?= campo_token() ?><button class="admin-salir" name="accion" value="salir">Salir</button></form>
             </nav>
         <?php endif; ?>
@@ -99,4 +100,52 @@ function admin_cabecera(string $titulo, string $actual = ''): void
 function admin_pie(): void
 {
     echo "</main>\n</body>\n</html>\n";
+}
+
+/**
+ * Importa registros ya convertidos (de la BN, la U. de Chile, etc.). Si uno ya estaba (mismo identificador de origen),
+ * actualiza sus datos y conserva colección, enlace, portada y ejemplares. Devuelve [nuevos, actualizados, ids].
+ */
+function importar_registros(array $regs, string $coleccion, bool $crear_ejemplar, bool $con_portada): array
+{
+    $pdo = db();
+    $buscar = $pdo->prepare("SELECT id FROM registros WHERE fuente_id = ? AND fuente_id <> ''");
+    $ins_ej = $pdo->prepare("INSERT INTO ejemplares (registro_id, descripcion, estado, orden) VALUES (?, 'c.1', 'En proceso técnico', 0)");
+    $nuevos = $actualizados = 0;
+    $ids = [];
+    $pendientes_portada = [];
+    $pdo->beginTransaction();
+    foreach ($regs as $reg) {
+        if (isset(COLECCIONES[$coleccion])) {
+            $reg['coleccion'] = $coleccion;
+        }
+        $buscar->execute([$reg['fuente_id'] ?? '']);
+        $existente = (int) $buscar->fetchColumn();
+        if ($existente) {
+            $actual = registro($existente);
+            $reg['enlace']    = $actual['enlace'];
+            $reg['coleccion'] = $actual['coleccion'];
+            registro_guardar($reg, $existente);
+            $ids[] = $existente;
+            $actualizados++;
+            continue;
+        }
+        $nid = registro_guardar($reg);
+        if ($crear_ejemplar) {
+            $ins_ej->execute([$nid]);
+        }
+        $ids[] = $nid;
+        $nuevos++;
+        if ($con_portada) {
+            $pendientes_portada[$nid] = $reg['portada_url'] ?? '' ?: (function_exists('portada_por_isbn') ? portada_por_isbn((string) ($reg['isbn'] ?? '')) : '');
+        }
+    }
+    $pdo->commit();
+    // Las portadas se descargan después de guardar, para no dejar la base bloqueada mientras tanto.
+    foreach ($pendientes_portada as $nid => $url) {
+        if ($url !== '' && ($bytes = http_get($url, 12)) !== '') {
+            portada_guardar($nid, $bytes);
+        }
+    }
+    return [$nuevos, $actualizados, $ids];
 }
