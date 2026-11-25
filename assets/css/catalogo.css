@@ -108,6 +108,20 @@
 /* MARC */
 .marc { overflow-x: auto; max-width: 100%; padding: 20px 24px; background: var(--tinta-3); color: #DBE7F1; border-radius: 12px; font: 400 .875rem/1.7 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; white-space: pre-wrap; }
 
+/* Hemeroteca: existencias por año */
+.existencias__resumen { margin: -8px 0 16px; color: var(--suave); }
+.anio-hem { border-top: 1px solid var(--linea); }
+.anio-hem:last-of-type { border-bottom: 1px solid var(--linea); }
+.anio-hem > summary { display: flex; align-items: baseline; gap: 16px; padding: 16px 0; cursor: pointer; list-style: none; }
+.anio-hem > summary::-webkit-details-marker { display: none; }
+.anio-hem > summary::before { content: "+"; width: 24px; color: var(--naranja); font-weight: 600; }
+.anio-hem[open] > summary::before { content: "−"; }
+.anio-hem__anio { font-family: var(--titulos); font-size: 1.5rem; color: var(--tinta); }
+.anio-hem__cuenta { font-size: .875rem; color: var(--tenue); }
+.anio-hem .tabla-envoltura { margin: 0 0 24px; }
+.unidad { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: .8125rem; font-weight: 500; background: #EEF2F6; color: #4A5B6A; }
+.unidad--tomo { background: #FFF0DD; color: #8A4B00; }
+
 /* Ejemplares */
 .existencias { padding: 48px 0 80px; }
 .existencias h2 { font-size: 1.75rem; }

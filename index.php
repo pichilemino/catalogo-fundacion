@@ -125,7 +125,7 @@ $conteo = db()->query("SELECT coleccion, COUNT(*) n FROM registros GROUP BY cole
                     </div>
                     <div class="obra__meta">
                         <span class="cifra"><?= e(signatura($r)) ?></span>
-                        <span><?= (int) $r['n_ejemplares'] === 0 ? 'Sin ejemplares aún' : ((int) $r['n_ejemplares'] === 1 ? '1 ejemplar' : (int) $r['n_ejemplares'] . ($r['coleccion'] === 'hemeroteca' ? ' tomos' : ' ejemplares')) ?></span>
+                        <span><?= (int) $r['n_ejemplares'] === 0 ? 'Sin ejemplares aún' : ((int) $r['n_ejemplares'] === 1 ? ($r['coleccion'] === 'hemeroteca' ? '1 número o tomo' : '1 ejemplar') : (int) $r['n_ejemplares'] . ($r['coleccion'] === 'hemeroteca' ? ' números y tomos' : ' ejemplares')) ?></span>
                     </div>
                 </li>
             <?php endforeach; ?>

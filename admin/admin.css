@@ -76,3 +76,13 @@ fieldset.admin-caja { display: grid; gap: 16px; }
 .admin-portada__img img { width: 100%; height: 100%; object-fit: cover; }
 .admin-portada__acciones { display: grid; gap: 12px; }
 @media (max-width: 760px) { .admin-externos { grid-template-columns: 1fr; } }
+
+/* Unidades: ejemplares (libros) o números y tomos (hemeroteca) */
+.unidades .solo-seriada { display: none; }
+.unidades.es-seriada .solo-seriada { display: revert; }
+.unidades.es-seriada .solo-libro { display: none; }
+.unidades .admin-fila--ej { grid-template-columns: 1.6fr 1fr 1.4fr 170px 1.4fr 80px; min-width: 860px; }
+.unidades.es-seriada .admin-fila--ej { grid-template-columns: 150px 72px 150px 150px 1.4fr 1.2fr 160px 1fr 72px; min-width: 1120px; }
+.generador { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--linea); }
+.generador .admin-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
+@media (max-width: 760px) { .generador .admin-rejilla { grid-template-columns: 1fr 1fr; } }

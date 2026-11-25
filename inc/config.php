@@ -23,6 +23,8 @@ const FORMATOS = [
     'libro' => 'Libro', 'folleto' => 'Folleto', 'periodico' => 'Periódico', 'revista' => 'Revista',
     'mapa' => 'Mapa', 'documento' => 'Documento', 'otro' => 'Otro',
 ];
+/** Unidades físicas: un ejemplar de un libro; en publicaciones seriadas, un número suelto o un tomo que agrupa un período. */
+const TIPOS_UNIDAD = ['ejemplar' => 'Ejemplar', 'numero' => 'Número suelto', 'tomo' => 'Tomo o período'];
 const ESTADOS = ['Disponible', 'En proceso técnico', 'En encuadernación', 'En restauración', 'No disponible'];
 const CAMPOS_BUSQUEDA = ['todo' => 'Todos los campos', 'titulo' => 'Título', 'autor' => 'Autor', 'materia' => 'Materia', 'anio' => 'Año'];
 const ORDENES = ['anio' => 'Año (recientes primero)', 'titulo' => 'Título', 'autor' => 'Autor'];
@@ -90,6 +92,12 @@ function db(): PDO
     if (!in_array('portada', $cols, true)) {
         $pdo->exec('ALTER TABLE registros ADD COLUMN portada TEXT');
     }
+    $cols_ej = array_column($pdo->query('PRAGMA table_info(ejemplares)')->fetchAll(), 'name');
+    foreach (['tipo' => "TEXT NOT NULL DEFAULT 'ejemplar'", 'numero' => 'TEXT', 'fecha_desde' => 'TEXT', 'fecha_hasta' => 'TEXT'] as $c => $def) {
+        if (!in_array($c, $cols_ej, true)) {
+            $pdo->exec("ALTER TABLE ejemplares ADD COLUMN $c $def");
+        }
+    }
     return $pdo;
 }
 
@@ -138,7 +146,7 @@ function registro(int $id): ?array
 
 function ejemplares(int $id): array
 {
-    $st = db()->prepare('SELECT * FROM ejemplares WHERE registro_id = ? ORDER BY orden, id');
+    $st = db()->prepare("SELECT * FROM ejemplares WHERE registro_id = ? ORDER BY CASE WHEN fecha_desde IS NULL OR fecha_desde = '' THEN 1 ELSE 0 END, fecha_desde, orden, id");
     $st->execute([$id]);
     return $st->fetchAll();
 }
@@ -240,4 +248,76 @@ function portada_borrar(int $id): void
         @unlink(PORTADAS_DIR . '/' . basename($r['portada']));
     }
     db()->prepare('UPDATE registros SET portada = NULL WHERE id = ?')->execute([$id]);
+}
+
+const MESES = [1 => 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/** «2015-03-27» → «27 de marzo de 2015» (sin año si $con_anio es falso). */
+function fecha_larga(?string $f, bool $con_anio = true): string
+{
+    if (!$f || !preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $f, $m)) {
+        return (string) $f;
+    }
+    return (int) $m[3] . ' de ' . MESES[(int) $m[2]] . ($con_anio ? ' de ' . $m[1] : '');
+}
+
+/** Rango de fechas legible: «enero–marzo de 2015», «27 de febrero de 1973», «diciembre de 2014 – enero de 2015». */
+function rango_fechas(?string $desde, ?string $hasta): string
+{
+    if (!$desde) {
+        return '';
+    }
+    if (!$hasta || $hasta === $desde) {
+        return fecha_larga($desde);
+    }
+    [$y1, $m1, $d1] = array_map('intval', explode('-', $desde));
+    [$y2, $m2, $d2] = array_map('intval', explode('-', $hasta));
+    $mes_completo = $d1 === 1 && $d2 === (int) date('t', mktime(0, 0, 0, $m2, 1, $y2));
+    if ($mes_completo) {
+        $ini = MESES[$m1] . ($y1 !== $y2 ? ' de ' . $y1 : '');
+        return ($m1 === $m2 && $y1 === $y2) ? MESES[$m1] . ' de ' . $y1 : $ini . ($y1 !== $y2 ? ' – ' : '–') . MESES[$m2] . ' de ' . $y2;
+    }
+    return fecha_larga($desde, $y1 !== $y2) . ' – ' . fecha_larga($hasta);
+}
+
+/** Texto de una unidad: su descripción o, si no tiene, lo que dicen su número y sus fechas. */
+function unidad_etiqueta(array $x): string
+{
+    if (trim((string) $x['descripcion']) !== '') {
+        return (string) $x['descripcion'];
+    }
+    $partes = array_filter([$x['numero'] ? 'N.° ' . $x['numero'] : '', rango_fechas($x['fecha_desde'] ?? '', ($x['tipo'] ?? '') === 'tomo' ? ($x['fecha_hasta'] ?? '') : '')]);
+    return $partes ? ucfirst(implode(', ', $partes)) : '';
+}
+
+/** Años que cubren las unidades fechadas, resumidos en tramos: «1973; 2013–2016; 2020». */
+function cobertura_calculada(array $unidades): string
+{
+    $anios = [];
+    foreach ($unidades as $x) {
+        $a = (int) substr((string) ($x['fecha_desde'] ?? ''), 0, 4);
+        $b = (int) substr((string) ($x['fecha_hasta'] ?: ($x['fecha_desde'] ?? '')), 0, 4);
+        if ($a > 0) {
+            for ($y = $a; $y <= max($a, $b); $y++) {
+                $anios[$y] = true;
+            }
+        }
+    }
+    ksort($anios);
+    $tramos = [];
+    $ini = $prev = null;
+    foreach (array_keys($anios) as $y) {
+        if ($prev !== null && $y === $prev + 1) {
+            $prev = $y;
+            continue;
+        }
+        if ($ini !== null) {
+            $tramos[] = $ini === $prev ? (string) $ini : "{$ini}–{$prev}";
+        }
+        $ini = $prev = $y;
+    }
+    if ($ini !== null) {
+        $tramos[] = $ini === $prev ? (string) $ini : "{$ini}–{$prev}";
+    }
+    return implode('; ', $tramos);
 }

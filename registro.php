@@ -129,7 +129,7 @@ require __DIR__ . '/inc/cabecera.php';
         <?php endif; ?>
         <dl class="tejuelo__datos">
             <div><dt>Colección</dt><dd><?= e($hemer ? 'Hemeroteca' : 'Biblioteca') ?></dd></div>
-            <div><dt><?= $hemer ? 'Tomos' : 'Ejemplares' ?></dt><dd class="cifra"><?= count($ejs) ?></dd></div>
+            <div><dt><?= $hemer ? 'Números y tomos' : 'Ejemplares' ?></dt><dd class="cifra"><?= count($ejs) ?></dd></div>
             <?php if ($ejs) : $disp = count(array_filter($ejs, fn ($x) => $x['estado'] === 'Disponible')); ?>
                 <div><dt>Disponibles</dt><dd class="cifra"><?= $disp ?> de <?= count($ejs) ?></dd></div>
             <?php endif; ?>
@@ -142,15 +142,56 @@ require __DIR__ . '/inc/cabecera.php';
 </section>
 
 <section class="envoltura existencias">
-    <h2><?= $hemer ? 'Tomos en la hemeroteca' : 'Ejemplares' ?></h2>
-    <?php if ($ejs) : ?>
+    <?php
+    $seriada = $hemer || in_array($r['formato'], ['periodico', 'revista'], true);
+    $n_num   = count(array_filter($ejs, fn ($x) => ($x['tipo'] ?? '') === 'numero'));
+    $n_tomo  = count(array_filter($ejs, fn ($x) => ($x['tipo'] ?? '') === 'tomo'));
+    ?>
+    <h2><?= $seriada ? 'En la hemeroteca' : 'Ejemplares' ?></h2>
+    <?php if ($seriada && $ejs) : ?>
+        <p class="existencias__resumen">
+            <?= implode(' · ', array_filter([
+                $n_num ? $n_num . ($n_num === 1 ? ' número suelto' : ' números sueltos') : '',
+                $n_tomo ? $n_tomo . ($n_tomo === 1 ? ' tomo' : ' tomos') : '',
+                $r['cobertura'] ? 'Años: ' . e($r['cobertura']) : '',
+            ])) ?>
+        </p>
+        <?php
+        // Agrupados por año; las unidades sin fecha van al final.
+        $por_anio = [];
+        foreach ($ejs as $x) {
+            $por_anio[substr((string) $x['fecha_desde'], 0, 4) ?: 'Sin fecha'][] = $x;
+        }
+        ?>
+        <?php foreach ($por_anio as $anio => $grupo) : ?>
+            <details class="anio-hem"<?= count($por_anio) <= 3 ? ' open' : '' ?>>
+                <summary><span class="anio-hem__anio"><?= e((string) $anio) ?></span><span class="anio-hem__cuenta"><?= count($grupo) ?> <?= count($grupo) === 1 ? 'unidad' : 'unidades' ?></span></summary>
+                <div class="tabla-envoltura">
+                    <table class="catalogo">
+                        <thead><tr><th scope="col">Número o período</th><th scope="col">Tipo</th><th scope="col">Ubicación</th><th scope="col">Estado</th><th scope="col">Nota</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($grupo as $x) : ?>
+                                <tr>
+                                    <td><?= e(unidad_etiqueta($x)) ?></td>
+                                    <td><span class="unidad unidad--<?= e($x['tipo'] ?? 'ejemplar') ?>"><?= e(($x['tipo'] ?? '') === 'tomo' ? 'Tomo' : (($x['tipo'] ?? '') === 'numero' ? 'Número' : 'Ejemplar')) ?></span></td>
+                                    <td><?= e($x['ubicacion']) ?></td>
+                                    <td><span class="estado<?= $x['estado'] === 'Disponible' ? ' estado--si' : '' ?>"><?= e($x['estado']) ?></span></td>
+                                    <td><?= e($x['nota']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        <?php endforeach; ?>
+    <?php elseif ($ejs) : ?>
         <div class="tabla-envoltura">
             <table class="catalogo">
-                <thead><tr><th scope="col"><?= $hemer ? 'Tomo' : 'Ejemplar' ?></th><th scope="col">Código</th><th scope="col">Ubicación</th><th scope="col">Estado</th><th scope="col">Nota</th></tr></thead>
+                <thead><tr><th scope="col">Ejemplar</th><th scope="col">Código</th><th scope="col">Ubicación</th><th scope="col">Estado</th><th scope="col">Nota</th></tr></thead>
                 <tbody>
                     <?php foreach ($ejs as $x) : ?>
                         <tr>
-                            <td><?= e($x['descripcion']) ?></td>
+                            <td><?= e(unidad_etiqueta($x)) ?></td>
                             <td class="cifra"><?= e($x['codigo']) ?></td>
                             <td><?= e($x['ubicacion']) ?></td>
                             <td><span class="estado<?= $x['estado'] === 'Disponible' ? ' estado--si' : '' ?>"><?= e($x['estado']) ?></span></td>
@@ -161,7 +202,7 @@ require __DIR__ . '/inc/cabecera.php';
             </table>
         </div>
     <?php else : ?>
-        <p class="vacio">Esta obra está catalogada, pero sus ejemplares todavía se están ordenando.</p>
+        <p class="vacio"><?= $seriada ? 'Este título está catalogado, pero sus números y tomos todavía se están ordenando.' : 'Esta obra está catalogada, pero sus ejemplares todavía se están ordenando.' ?></p>
     <?php endif; ?>
     <p class="existencias__nota"><a href="index.php">← Volver a buscar</a></p>
 </section>
